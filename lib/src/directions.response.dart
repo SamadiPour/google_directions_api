@@ -41,12 +41,14 @@ class DirectionsResult {
       DirectionsResult(
         routes: (map['routes'] as List?)
             ?.mapList((_) => DirectionsRoute.fromMap(_)),
-        geocodedWaypoints:
-            (map[''] as List?)?.mapList((_) => GeocodedWaypoint.fromMap(_)),
-        status: map['status'] != null ? DirectionsStatus(map['status']) : null,
+        geocodedWaypoints: (map['geocoded_waypoints'] as List?)
+            ?.mapList((_) => GeocodedWaypoint.fromMap(_)),
+        status: map['status'] != null
+            ? DirectionsStatus.fromJson(map['status'])
+            : null,
         errorMessage: map['error_message'] as String?,
         availableTravelModes: (map['available_travel_modes'] as List?)
-            ?.mapList((_) => TravelMode(_)),
+            ?.mapList((_) => TravelMode.fromJson(_)),
       );
 
   /// When the Directions API returns results, it places them within a
@@ -815,8 +817,9 @@ class Step {
         transit: map['transit_details'] != null
             ? TransitDetails.fromMap(map['transit_details'])
             : null,
-        travelMode:
-            map['travel_mode'] != null ? TravelMode(map['travel_mode']) : null,
+        travelMode: map['travel_mode'] != null
+            ? TravelMode.fromJson(map['travel_mode'])
+            : null,
         polyline: map['polyline'] != null
             ? OverviewPolyline.fromMap(map['polyline'])
             : null,
@@ -1378,7 +1381,7 @@ class Vehicle {
 
   factory Vehicle.fromMap(Map<String, dynamic> map) => Vehicle(
         name: map['name'] as String?,
-        type: map['type'] != null ? VehicleType(map['type']) : null,
+        type: map['type'] != null ? VehicleType.fromJson(map['type']) : null,
         icon: map['icon'] as String?,
         localIcon: map['local_icon'] as String?,
       );
@@ -1426,48 +1429,32 @@ class ViaWaypoint {
 /// The status field within the Directions response object contains
 /// the status of the request, and may contain debugging information
 /// to help you track down why the Directions service failed.
-class DirectionsStatus {
-  const DirectionsStatus(this._name);
-
-  final String? _name;
-
-  static final values = <DirectionsStatus>[
-    invalidRequest,
-    maxWaypointExceeded,
-    notFound,
-    ok,
-    overQueryLimit,
-    requestDenied,
-    unknownError,
-    zeroResults
-  ];
-
+enum DirectionsStatus {
   /// Indicates the response contains a valid result.
-  static const ok = DirectionsStatus('OK');
+  ok('OK'),
 
   /// Indicates at least one of the locations specified in the
   /// request's origin, destination, or waypoints could not be geocoded.
-  static const notFound = DirectionsStatus('NOT_FOUND');
+  notFound('NOT_FOUND'),
 
   /// Indicates no route could be found between the origin and destination.
-  static const zeroResults = DirectionsStatus('ZERO_RESULTS');
+  zeroResults('ZERO_RESULTS'),
 
   /// Indicates that too many waypoints were provided in the request.
   /// For applications using the Directions API as a web service, or
   /// the [directions service in the Maps JavaScript API][maps_js_api],
   /// the maximum allowed number of waypoints is 25, plus the origin
   /// and destination.
-  static const maxWaypointExceeded = DirectionsStatus('MAX_WAYPOINTS_EXCEEDED');
+  maxWaypointExceeded('MAX_WAYPOINTS_EXCEEDED'),
 
   /// Indicates the requested route is too long and cannot be processed.
   /// This error occurs when more complex directions are returned. Try
   /// reducing the number of waypoints, turns, or instructions.
-  static const maxRouteLengthExceeded =
-      DirectionsStatus('MAX_ROUTE_LENGTH_EXCEEDED');
+  maxRouteLengthExceeded('MAX_ROUTE_LENGTH_EXCEEDED'),
 
   /// Indicates that the provided request was invalid. Common causes of
   /// this status include an invalid parameter or parameter value.
-  static const invalidRequest = DirectionsStatus('INVALID_REQUEST');
+  invalidRequest('INVALID_REQUEST'),
 
   /// Indicates any of the following:
   ///     * The API key is missing or invalid.
@@ -1476,122 +1463,95 @@ class DirectionsStatus {
   ///     * The provided method of payment is no longer valid (for example,
   /// a credit card has expired).
   ///     * See the [Maps FAQ][faq] to learn how to fix this.
-  static const overDailyLimit = DirectionsStatus('OVER_DAILY_LIMIT');
+  overDailyLimit('OVER_DAILY_LIMIT'),
 
   /// Indicates the service has received too many requests from your
   /// application within the allowed time period.
-  static const overQueryLimit = DirectionsStatus('OVER_QUERY_LIMIT');
+  overQueryLimit('OVER_QUERY_LIMIT'),
 
   /// Indicates that the service denied use of the directions service
   /// by your application.
-  static const requestDenied = DirectionsStatus('REQUEST_DENIED');
+  requestDenied('REQUEST_DENIED'),
 
   /// Indicates a directions request could not be processed due to a
   /// server error. The request may succeed if you try again.
-  static const unknownError = DirectionsStatus('UNKNOWN_ERROR');
+  unknownError('UNKNOWN_ERROR');
 
-  @override
-  int get hashCode => _name.hashCode;
+  final String key;
 
-  @override
-  bool operator ==(dynamic other) =>
-      other is DirectionsStatus && _name == other._name;
+  const DirectionsStatus(this.key);
 
-  @override
-  String toString() => '$_name';
+  static DirectionsStatus fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }
 
 /// Type of vehicle.
-class VehicleType {
-  const VehicleType(this._name);
-
-  final String? _name;
-
-  static final values = <VehicleType>[
-    bus,
-    cableCard,
-    commuterTrain,
-    ferry,
-    funicular,
-    gondolaLift,
-    heavyRail,
-    highSpeedTrain,
-    intercityBus,
-    longDistanceTrain,
-    metroRail,
-    monorail,
-    other,
-    rail,
-    shareTaxi,
-    subway,
-    tram,
-    trolleybus,
-  ];
-
+enum VehicleType {
   /// Bus.
-  static const bus = VehicleType('BUS');
+  bus('BUS'),
 
   /// A vehicle that operates on a cable, usually on the ground.
   /// Aerial cable cars may be of the type GONDOLA_LIFT.
-  static const cableCard = VehicleType('CABLE_CAR');
+  cableCard('CABLE_CAR'),
 
   /// Commuter rail.
-  static const commuterTrain = VehicleType('COMMUTER_TRAIN');
+  commuterTrain('COMMUTER_TRAIN'),
 
   /// Ferry.
-  static const ferry = VehicleType('FERRY');
+  ferry('FERRY'),
 
   /// A vehicle that is pulled up a steep incline by a cable.
-  static const funicular = VehicleType('FUNICULAR');
+  funicular('FUNICULAR'),
 
   /// An aerial cable car.
-  static const gondolaLift = VehicleType('GONDOLA_LIFT');
+  gondolaLift('GONDOLA_LIFT'),
 
   /// Heavy rail.
-  static const heavyRail = VehicleType('HEAVY_RAIL');
+  heavyRail('HEAVY_RAIL'),
 
   /// High speed train.
-  static const highSpeedTrain = VehicleType('HIGH_SPEED_TRAIN');
+  highSpeedTrain('HIGH_SPEED_TRAIN'),
 
   /// Intercity bus.
-  static const intercityBus = VehicleType('INTERCITY_BUS');
+  intercityBus('INTERCITY_BUS'),
 
   /// Long distance train.
-  static const longDistanceTrain = VehicleType('LONG_DISTANCE_TRAIN');
+  longDistanceTrain('LONG_DISTANCE_TRAIN'),
 
   /// Light rail.
-  static const metroRail = VehicleType('METRO_RAIL');
+  metroRail('METRO_RAIL'),
 
   /// Monorail.
-  static const monorail = VehicleType('MONORAIL');
+  monorail('MONORAIL'),
 
   /// Other vehicles.
-  static const other = VehicleType('OTHER');
+  other('OTHER'),
 
   /// Rail.
-  static const rail = VehicleType('RAIL');
+  rail('RAIL'),
 
   /// Share taxi is a sort of bus transport with ability to drop
   /// off and pick up passengers anywhere on its route. Generally
   /// share taxi uses minibus vehicles.
-  static const shareTaxi = VehicleType('SHARE_TAXI');
+  shareTaxi('SHARE_TAXI'),
 
   /// Underground light rail.
-  static const subway = VehicleType('SUBWAY');
+  subway('SUBWAY'),
 
   /// Above ground light rail.
-  static const tram = VehicleType('TRAM');
+  tram('TRAM'),
 
   /// Trolleybus.
-  static const trolleybus = VehicleType('TROLLEYBUS');
+  trolleybus('TROLLEYBUS');
 
-  @override
-  int get hashCode => _name.hashCode;
+  final String key;
 
-  @override
-  bool operator ==(dynamic other) =>
-      other is VehicleType && _name == other._name;
+  const VehicleType(this.key);
 
-  @override
-  String toString() => '$_name';
+  static VehicleType fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }

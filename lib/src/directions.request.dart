@@ -221,11 +221,11 @@ class DirectionsRequest {
   @override
   String toString() => '?origin=${_convertLocation(origin)}&'
       'destination=${_convertLocation(destination)}'
-      '${_addIfNotNull('mode', travelMode?.toString().toLowerCase())}'
+      '${_addIfNotNull('mode', travelMode?.toJson().toLowerCase())}'
       '${_addIfNotNull('waypoints', _convertWaypoints())}'
       '${_addIfNotNull('alternatives', alternatives)}'
       '${_addIfNotNull('avoid', _convertAvoids())}'
-      '${_addIfNotNull('units', unitSystem)}'
+      '${_addIfNotNull('units', unitSystem?.toJson())}'
       '${_addIfNotNull('region', region)}'
       '${_addIfNotNull('language', language)}'
       '${drivingOptions == null ? '' : drivingOptions.toString()}'
@@ -431,8 +431,8 @@ class TransitOptions {
   String toString() =>
       '${_addIfNotNull('arrival_time', arrivalTime?.millisecondsSinceEpoch)}'
       '${_addIfNotNull('departure_time', departureTime?.millisecondsSinceEpoch)}'
-      '${_addIfNotNull('transit_mode', modes?.map((_) => _.toString()).join('|'))}'
-      '${_addIfNotNull('transit_routing_preference', routingPreference)}';
+      '${_addIfNotNull('transit_mode', modes?.map((_) => _.toJson()).join('|'))}'
+      '${_addIfNotNull('transit_routing_preference', routingPreference?.toJson())}';
 }
 
 /// Specifies the desired time of departure and/or desired assumption
@@ -557,7 +557,7 @@ class DrivingOptions {
   @override
   String toString() =>
       '${_addIfNotNull('departure_time', departureTime?.millisecondsSinceEpoch)}'
-      '${_addIfNotNull('traffic_model', trafficModel)}';
+      '${_addIfNotNull('traffic_model', trafficModel?.toJson())}';
 }
 
 /// Directions results contain `text` within `distance` fields
@@ -579,23 +579,23 @@ class DrivingOptions {
 /// Note: this unit system setting only affects the text displayed
 /// within distance fields. The distance fields also contain values
 /// which are always expressed in meters.
-class UnitSystem {
-  const UnitSystem(this._name);
-
-  final String _name;
-
-  static final values = <UnitSystem>[imperial, metric];
+enum UnitSystem {
+  /// Specifies usage of the Imperial (English) system. Textual
+  /// distances are returned using miles and feet.
+  imperial('imperial'),
 
   /// Specifies usage of the metric system. Textual distances are
   /// returned using kilometers and meters.
-  static const imperial = UnitSystem('IMPERIAL');
+  metric('metric');
 
-  /// Specifies usage of the Imperial (English) system. Textual
-  /// distances are returned using miles and feet.
-  static const metric = UnitSystem('METRIC');
+  final String key;
 
-  @override
-  String toString() => _name;
+  const UnitSystem(this.key);
+
+  static UnitSystem fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }
 
 /// Specifies one or more preferred modes of transit. This parameter
@@ -613,41 +613,35 @@ class UnitSystem {
 ///  * `rail` indicates that the calculated route should prefer travel
 /// by train, tram, light rail, and subway. This is equivalent to
 /// `transitMode=train|tram|subway`.
-class TransitMode {
-  const TransitMode(this._name);
-
-  final String _name;
-
-  static final values = <TransitMode>[
-    bus,
-    subway,
-    train,
-    tram,
-    rail,
-  ];
-
+enum TransitMode {
   /// Indicates that the calculated route should prefer travel
   /// by bus.
-  static const bus = TransitMode('bus');
+  bus('bus'),
 
   /// Indicates that the calculated route should prefer travel
-  /// by bus.
-  static const subway = TransitMode('subway');
+  /// by subway.
+  subway('subway'),
 
   /// Indicates that the calculated route should prefer travel
-  /// by bus.
-  static const train = TransitMode('train');
+  /// by train.
+  train('train'),
 
   /// Indicates that the calculated route should prefer travel
-  /// by bus.
-  static const tram = TransitMode('tram');
+  /// by tram.
+  tram('tram'),
 
   /// Indicates that the calculated route should prefer travel
-  /// by bus.
-  static const rail = TransitMode('rail');
+  /// by rail.
+  rail('rail');
 
-  @override
-  String toString() => _name;
+  final String key;
+
+  const TransitMode(this.key);
+
+  static TransitMode fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }
 
 /// Specifies preferences for transit routes. Using this parameter,
@@ -660,23 +654,23 @@ class TransitMode {
 /// prefer limited amounts of walking.
 ///  * `fewerTransfers` indicates that the calculated route should
 /// prefer a limited number of transfers.
-class TransitRoutingPreference {
-  const TransitRoutingPreference(this._name);
-
-  final String _name;
-
-  static final values = <TransitRoutingPreference>[lessWalking, fewerTransfers];
-
+enum TransitRoutingPreference {
   /// Indicates that the calculated route should prefer limited
   /// amounts of walking.
-  static const lessWalking = TransitRoutingPreference('less_walking');
+  lessWalking('less_walking'),
 
   /// Indicates that the calculated route should prefer a limited
   /// number of transfers
-  static const fewerTransfers = TransitRoutingPreference('fewer_transfers');
+  fewerTransfers('fewer_transfers');
 
-  @override
-  String toString() => _name;
+  final String key;
+
+  const TransitRoutingPreference(this.key);
+
+  static TransitRoutingPreference fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }
 
 /// Specifies the assumptions to use when calculating time in traffic.
@@ -700,34 +694,31 @@ class TransitRoutingPreference {
 /// should be shorter than the actual travel time on most days, though
 /// occasional days with particularly good traffic conditions may be
 /// faster than this value.
-class TrafficModel {
-  const TrafficModel(this._name);
-
-  final String _name;
-
-  static final values = <TrafficModel>[
-    bestGuess,
-    pessimistic,
-  ];
-
+enum TrafficModel {
   /// Indicates that the returned `durationInTraffic`
   /// should be the best estimate of travel time given what is known about
   /// both historical traffic conditions and live traffic. Live traffic
   /// becomes more important the closer the `departureTime` is to now.
-  static const bestGuess = TrafficModel('best_guess');
+  bestGuess('best_guess'),
 
   /// Indicates that the returned `durationInTraffic`
   /// should be longer than the actual travel time on most days, though
   /// occasional days with particularly bad traffic conditions may
   /// exceedthis value.
-  static const pessimistic = TrafficModel('pessimistic');
+  pessimistic('pessimistic'),
 
   /// Indicates that the returned `durationInTraffic`
   /// should be shorter than the actual travel time on most days, though
   /// occasional days with particularly good traffic conditions may be
   /// faster than this value.
-  static const optimistic = TrafficModel('optimistic');
+  optimistic('optimistic');
 
-  @override
-  String toString() => _name;
+  final String key;
+
+  const TrafficModel(this.key);
+
+  static TrafficModel fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }

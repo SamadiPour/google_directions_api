@@ -153,32 +153,25 @@ class GeoCoordBounds {
 /// `DirectionsRequest` as well as the travel modes returned
 /// in a `DirectionsStep`. Specify these by value, or by using
 /// the constant's name.
-class TravelMode {
-  const TravelMode(this._name);
-
-  final String _name;
-
-  static final values = <TravelMode>[bicycling, driving, transit, walking];
-
+enum TravelMode {
   /// Specifies a bicycling directions request.
-  static const bicycling = TravelMode('BICYCLING');
+  bicycling('BICYCLING'),
 
   /// Specifies a driving directions request.
-  static const driving = TravelMode('DRIVING');
+  driving('DRIVING'),
 
   /// Specifies a transit directions request.
-  static const transit = TravelMode('TRANSIT');
+  transit('TRANSIT'),
 
   /// Specifies a walking directions request.
-  static const walking = TravelMode('WALKING');
+  walking('WALKING');
 
-  @override
-  int get hashCode => _name.hashCode;
+  final String key;
 
-  @override
-  bool operator ==(dynamic other) =>
-      other is TravelMode && _name == other._name;
+  const TravelMode(this.key);
 
-  @override
-  String toString() => _name;
+  static TravelMode fromJson(String key) =>
+      values.firstWhere((element) => element.key == key);
+
+  String toJson() => key;
 }
