@@ -1474,7 +1474,7 @@ enum TransitVehicleType {
 
   /// A vehicle that operates on a cable, usually on the ground.
   /// Aerial cable cars may be of the type GONDOLA_LIFT.
-  cableCard('CABLE_CAR'),
+  cableCar('CABLE_CAR'),
 
   /// Commuter rail.
   commuterTrain('COMMUTER_TRAIN'),
