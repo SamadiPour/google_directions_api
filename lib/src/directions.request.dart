@@ -215,7 +215,7 @@ class DirectionsRequest {
     if (waypoints?.isEmpty != false) return null;
 
     return (optimizeWaypoints == true ? 'optimize:true|' : '') +
-        waypoints!.mapList((_) => _.toString()).join('|');
+        waypoints!.map((_) => _.toString()).toList().join('|');
   }
 
   @override

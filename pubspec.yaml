@@ -7,10 +7,8 @@ environment:
   sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
-
   google_polyline_algorithm: ^3.1.0
   http: ^0.13.5
-  flinq: ^2.0.2
 
 dev_dependencies:
   flutter_lints: ^2.0.1

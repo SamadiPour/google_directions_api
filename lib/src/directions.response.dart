@@ -40,15 +40,18 @@ class DirectionsResult {
   factory DirectionsResult.fromMap(Map<String, dynamic> map) =>
       DirectionsResult(
         routes: (map['routes'] as List?)
-            ?.mapList((_) => DirectionsRoute.fromMap(_)),
+            ?.map((_) => DirectionsRoute.fromMap(_))
+            .toList(),
         geocodedWaypoints: (map['geocoded_waypoints'] as List?)
-            ?.mapList((_) => GeocodedWaypoint.fromMap(_)),
+            ?.map((_) => GeocodedWaypoint.fromMap(_))
+            .toList(),
         status: map['status'] != null
             ? DirectionsStatus.fromJson(map['status'])
             : null,
         errorMessage: map['error_message'] as String?,
         availableTravelModes: (map['available_travel_modes'] as List?)
-            ?.mapList((_) => TravelMode.fromJson(_)),
+            ?.map((_) => TravelMode.fromJson(_))
+            .toList(),
       );
 
   /// When the Directions API returns results, it places them within a
@@ -202,14 +205,15 @@ class DirectionsRoute {
           southwest: _getGeoCoordFromMap(map['bounds']['southwest'])!,
         ),
         copyrights: map['copyrights'] as String?,
-        legs: (map['legs'] as List?)?.mapList((_) => Leg.fromMap(_)),
+        legs: (map['legs'] as List?)?.map((_) => Leg.fromMap(_)).toList(),
         overviewPolyline: map['overview_polyline'] != null
             ? OverviewPolyline.fromMap(map['overview_polyline'])
             : null,
         summary: map['summary'] as String?,
-        warnings: (map['warnings'] as List?)?.mapList((_) => _ as String?),
+        warnings: (map['warnings'] as List?)?.map((_) => _ as String?).toList(),
         waypointOrder: (map['waypoint_order'] as List?)
-            ?.mapList((_) => num.tryParse(_.toString())),
+            ?.map((_) => num.tryParse(_.toString()))
+            .toList(),
         fare: map['fare'] != null ? Fare.fromMap(map['fare']) : null,
       );
 
@@ -232,7 +236,8 @@ class DirectionsRoute {
       overviewPolyline?.points?.isNotEmpty == true
           ? gpl
               .decodePolyline(overviewPolyline!.points!)
-              .mapList((_) => GeoCoord._fromList(_))
+              .map((_) => GeoCoord._fromList(_))
+              .toList()
           : null;
 
   /// Contains a single points object that holds an
@@ -390,7 +395,7 @@ class GeocodedWaypoint {
         geocoderStatus: map['geocoder_status'] as String?,
         partialMatch: map['partial_match'] == 'true',
         placeId: map['place_id'] as String?,
-        types: (map['types'] as List?)?.mapList((_) => _ as String?),
+        types: (map['types'] as List?)?.map((_) => _ as String?).toList(),
       );
 
   /// Indicates the status code resulting from the geocoding
@@ -626,9 +631,10 @@ class Leg {
         endLocation: _getGeoCoordFromMap(map['end_location']),
         startAddress: map['start_address'] as String?,
         startLocation: _getGeoCoordFromMap(map['start_location']),
-        steps: (map['steps'] as List?)?.mapList((_) => Step.fromMap(_)),
+        steps: (map['steps'] as List?)?.map((_) => Step.fromMap(_)).toList(),
         viaWaypoint: (map['via_waypoint'] as List?)
-            ?.mapList((_) => ViaWaypoint.fromMap(_)),
+            ?.map((_) => ViaWaypoint.fromMap(_))
+            .toList(),
       );
 
   /// Contains the estimated time of arrival for this leg. This property
@@ -812,8 +818,9 @@ class Step {
         endLocation: _getGeoCoordFromMap(map['end_location']),
         startLocation: _getGeoCoordFromMap(map['start_location']),
         instructions: map['html_instructions'] as String?,
-        path: (map['path'] as List?)?.mapList((_) => _getGeoCoordFromMap(_)),
-        steps: (map['steps'] as List?)?.mapList((_) => Step.fromMap(_)),
+        path:
+            (map['path'] as List?)?.map((_) => _getGeoCoordFromMap(_)).toList(),
+        steps: (map['steps'] as List?)?.map((_) => Step.fromMap(_)).toList(),
         transit: map['transit_details'] != null
             ? TransitDetails.fromMap(map['transit_details'])
             : null,
@@ -1114,7 +1121,8 @@ class TransitLine {
         shortName: map['short_name'] as String?,
         color: map['color'] as String?,
         agencies: (map['agencies'] as List?)
-            ?.mapList((_) => TransitAgency.fromMap(_)),
+            ?.map((_) => TransitAgency.fromMap(_))
+            .toList(),
         url: map['url'] as String?,
         icon: map['icon'] as String?,
         textColor: map['text_color'] as String?,

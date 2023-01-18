@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 
-import 'package:flinq/flinq.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart'
     as gpl;
 import 'package:http/http.dart' as http;
