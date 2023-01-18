@@ -157,7 +157,7 @@ class DirectionsResult {
 /// A separate leg will be present for each waypoint or destination
 /// specified. (A route with no waypoints will contain exactly one
 /// leg within the legs array.) Each leg consists of a series of
-/// steps. (See [Leg].)
+/// steps. (See [DirectionsLeg].)
 ///  * `waypointOrder` contains an array indicating the order of any
 /// waypoints in the calculated route. This waypoints may be reordered
 /// if the request was passed optimize:true within its waypoints parameter.
@@ -205,7 +205,9 @@ class DirectionsRoute {
           southwest: _getGeoCoordFromMap(map['bounds']['southwest'])!,
         ),
         copyrights: map['copyrights'] as String?,
-        legs: (map['legs'] as List?)?.map((_) => Leg.fromMap(_)).toList(),
+        legs: (map['legs'] as List?)
+            ?.map((_) => DirectionsLeg.fromMap(_))
+            .toList(),
         overviewPolyline: map['overview_polyline'] != null
             ? OverviewPolyline.fromMap(map['overview_polyline'])
             : null,
@@ -229,8 +231,8 @@ class DirectionsRoute {
   /// A separate leg will be present for each waypoint or destination
   /// specified. (A route with no waypoints will contain exactly one
   /// leg within the legs array.) Each leg consists of a series of
-  /// steps. (See [Leg].)
-  final List<Leg>? legs;
+  /// steps. (See [DirectionsLeg].)
+  final List<DirectionsLeg>? legs;
 
   List<GeoCoord>? get overviewPath =>
       overviewPolyline?.points?.isNotEmpty == true
@@ -513,7 +515,7 @@ class GeocodedWaypoint {
 ///
 ///  * `steps` contains an array of steps denoting information
 /// about each separate step of the leg of the journey.
-/// (See [Step])
+/// (See [DirectionsStep])
 ///
 ///  * `distance` indicates the total distance covered by this
 /// leg, as a field with the following elements:
@@ -562,7 +564,7 @@ class GeocodedWaypoint {
 ///
 ///  * `arrivalTime` contains the estimated time of arrival for this
 /// leg. This property is only returned for transit directions. The
-/// result is returned as a [Time] object with three properties:
+/// result is returned as a [TimeZoneTextValue] object with three properties:
 ///   * `value` the time specified as a [DateTime] object.
 ///   * `text` the time specified as a [String]. The time is displayed
 /// in the time zone of the transit stop.
@@ -571,7 +573,7 @@ class GeocodedWaypoint {
 /// Database][iana], e.g. `"America/New_York"`.
 ///
 ///  * `departureTime` contains the estimated time of departure for
-/// this leg, specified as a [Time] object. The departureTime
+/// this leg, specified as a [TimeZoneTextValue] object. The departureTime
 /// is only available for transit directions.
 ///
 ///  * `startLocation` contains the latitude/longitude coordinates
@@ -597,8 +599,8 @@ class GeocodedWaypoint {
 /// this leg.
 ///
 /// [iana]: http://www.iana.org/time-zones
-class Leg {
-  const Leg({
+class DirectionsLeg {
+  const DirectionsLeg({
     this.arrivalTime,
     this.departureTime,
     this.distance,
@@ -612,26 +614,27 @@ class Leg {
     this.viaWaypoint,
   });
 
-  factory Leg.fromMap(Map<String, dynamic> map) => Leg(
+  factory DirectionsLeg.fromMap(Map<String, dynamic> map) => DirectionsLeg(
         arrivalTime: map['arrival_time'] != null
-            ? Time.fromMap(map['arrival_time'])
+            ? TimeZoneTextValue.fromMap(map['arrival_time'])
             : null,
         departureTime: map['departure_time'] != null
-            ? Time.fromMap(map['departure_time'])
+            ? TimeZoneTextValue.fromMap(map['departure_time'])
             : null,
         distance:
-            map['distance'] != null ? Distance.fromMap(map['distance']) : null,
-        duration: map['duration'] != null
-            ? DirectionsDuration.fromMap(map['duration'])
-            : null,
+            map['distance'] != null ? TextValue.fromMap(map['distance']) : null,
+        duration:
+            map['duration'] != null ? TextValue.fromMap(map['duration']) : null,
         durationInTraffic: map['duration_in_traffic'] != null
-            ? DirectionsDuration.fromMap(map['duration_in_traffic'])
+            ? TextValue.fromMap(map['duration_in_traffic'])
             : null,
         endAddress: map['end_address'] as String?,
         endLocation: _getGeoCoordFromMap(map['end_location']),
         startAddress: map['start_address'] as String?,
         startLocation: _getGeoCoordFromMap(map['start_location']),
-        steps: (map['steps'] as List?)?.map((_) => Step.fromMap(_)).toList(),
+        steps: (map['steps'] as List?)
+            ?.map((_) => DirectionsStep.fromMap(_))
+            .toList(),
         viaWaypoint: (map['via_waypoint'] as List?)
             ?.map((_) => ViaWaypoint.fromMap(_))
             .toList(),
@@ -639,19 +642,19 @@ class Leg {
 
   /// Contains the estimated time of arrival for this leg. This property
   /// is only returned for transit directions. The result is returned as
-  /// a [Time] object with three properties:
+  /// a [TimeZoneTextValue] object with three properties:
   ///   * `value` the time specified as a [DateTime] object.
   ///   * `text` the time specified as a string. The time is displayed
   /// in the time zone of the transit stop.
   ///   * `timeZone` contains the time zone of this station. The value
   /// is the name of the time zone as defined in the [IANA Time Zone
   /// Database][iana], e.g. `"America/New_York"`.
-  final Time? arrivalTime;
+  final TimeZoneTextValue? arrivalTime;
 
   /// Contains the estimated time of departure for
-  /// this leg, specified as a [Time] object. The departureTime
+  /// this leg, specified as a [TimeZoneTextValue] object. The departureTime
   /// is only available for transit directions.
-  final Time? departureTime;
+  final TimeZoneTextValue? departureTime;
 
   /// Indicates the total distance covered by this leg, as a
   /// field with the following elements:
@@ -665,7 +668,7 @@ class Leg {
   /// field always contains a value expressed in meters.
   ///
   /// These fields may be absent if the distance is unknown.
-  final Distance? distance;
+  final TextValue? distance;
 
   /// Indicates the total duration of this leg, as a field with
   /// the following elements:
@@ -674,7 +677,7 @@ class Leg {
   /// duration.
   ///
   /// These fields may be absent if the duration is unknown.
-  final DirectionsDuration? duration;
+  final TextValue? duration;
 
   /// Indicates the total duration of this leg. This value is an
   /// estimate of the time in traffic based on current and historical
@@ -697,7 +700,7 @@ class Leg {
   ///   The `durationInTraffic` contains the following fields:
   ///   * `value` indicates the duration in seconds.
   ///   * `text` contains a human-readable representation of the duration.
-  final DirectionsDuration? durationInTraffic;
+  final TextValue? durationInTraffic;
 
   /// Contains the human-readable address (typically a street address)
   /// from reverse geocoding the `endLocation` of this leg.
@@ -725,7 +728,7 @@ class Leg {
 
   /// contains an array of steps denoting information about each
   /// separate step of the leg of the journey.
-  final List<Step>? steps;
+  final List<DirectionsStep>? steps;
 
   /// The locations of via waypoints along this leg.
   /// contains info about points through which the route was laid
@@ -794,8 +797,8 @@ class Leg {
 ///
 /// [directions_step_interface]: https://developers.google.com/maps/documentation/javascript/reference/directions#DirectionsStep
 /// [enc_polyline]: https://developers.google.com/maps/documentation/utilities/polylinealgorithm
-class Step {
-  const Step({
+class DirectionsStep {
+  const DirectionsStep({
     this.distance,
     this.duration,
     this.endLocation,
@@ -809,18 +812,19 @@ class Step {
     this.maneuver,
   });
 
-  factory Step.fromMap(Map<String, dynamic> map) => Step(
+  factory DirectionsStep.fromMap(Map<String, dynamic> map) => DirectionsStep(
         distance:
-            map['distance'] != null ? Distance.fromMap(map['distance']) : null,
-        duration: map['duration'] != null
-            ? DirectionsDuration.fromMap(map['duration'])
-            : null,
+            map['distance'] != null ? TextValue.fromMap(map['distance']) : null,
+        duration:
+            map['duration'] != null ? TextValue.fromMap(map['duration']) : null,
         endLocation: _getGeoCoordFromMap(map['end_location']),
         startLocation: _getGeoCoordFromMap(map['start_location']),
         instructions: map['html_instructions'] as String?,
         path:
             (map['path'] as List?)?.map((_) => _getGeoCoordFromMap(_)).toList(),
-        steps: (map['steps'] as List?)?.map((_) => Step.fromMap(_)).toList(),
+        steps: (map['steps'] as List?)
+            ?.map((_) => DirectionsStep.fromMap(_))
+            .toList(),
         transit: map['transit_details'] != null
             ? TransitDetails.fromMap(map['transit_details'])
             : null,
@@ -835,12 +839,12 @@ class Step {
 
   /// Contains the distance covered by this step until the next
   /// step. This field may be undefined if the distance is unknown.
-  final Distance? distance;
+  final TextValue? distance;
 
   /// Contains the typical time required to perform the step,
   /// until the next step. This field may be undefined if the
   /// duration is unknown.
-  final DirectionsDuration? duration;
+  final TextValue? duration;
 
   /// Contains the location of the last point of this step, as a
   /// single set of lat and lng fields.
@@ -863,7 +867,7 @@ class Step {
   /// steps in transit directions. Substeps are only available when
   /// travelMode is set to "transit". The inner steps array is of
   /// the same type as steps.
-  final List<Step>? steps;
+  final List<DirectionsStep>? steps;
 
   /// Contains transit specific information.
   /// This field is only returned with `travelMode` is set to
@@ -988,10 +992,10 @@ class TransitDetails {
             ? TransitStop.fromMap(map['departure_stop'])
             : null,
         arrivalTime: map['arrival_time'] != null
-            ? Time.fromMap(map['arrival_time'])
+            ? TimeZoneTextValue.fromMap(map['arrival_time'])
             : null,
         departureTime: map['departure_time'] != null
-            ? Time.fromMap(map['departure_time'])
+            ? TimeZoneTextValue.fromMap(map['departure_time'])
             : null,
         headsign: map['headsign'] as String?,
         headway: map['headway'] as num?,
@@ -1027,7 +1031,7 @@ class TransitDetails {
   /// [IANA Time Zone Database][iana], e.g. `"America/New_York"`.
   ///
   /// [iana]: http://www.iana.org/time-zones
-  final Time? arrivalTime;
+  final TimeZoneTextValue? arrivalTime;
 
   /// Contain the departure times for this leg of the journey,
   /// specified as the following three properties:
@@ -1040,7 +1044,7 @@ class TransitDetails {
   /// [IANA Time Zone Database][iana], e.g. `"America/New_York"`.
   ///
   /// [iana]: http://www.iana.org/time-zones
-  final Time? departureTime;
+  final TimeZoneTextValue? departureTime;
 
   /// Specifies the direction in which to travel on this line,
   /// as it is marked on the vehicle or at the departure stop.
@@ -1126,8 +1130,9 @@ class TransitLine {
         url: map['url'] as String?,
         icon: map['icon'] as String?,
         textColor: map['text_color'] as String?,
-        vehicle:
-            map['vehicle'] != null ? Vehicle.fromMap(map['vehicle']) : null,
+        vehicle: map['vehicle'] != null
+            ? TransitVehicle.fromMap(map['vehicle'])
+            : null,
       );
 
   /// Contains the full name of this transit line. eg. "7 Avenue Express".
@@ -1166,12 +1171,12 @@ class TransitLine {
   /// This may include the following properties:
   ///  * `name` contains the name of the vehicle on this line. eg. "Subway."
   ///  * `type` contains the type of vehicle that runs on this line.
-  /// See the [VehicleType] documentation for a complete list of
+  /// See the [TransitVehicleType] documentation for a complete list of
   /// supported values.
   ///  * `icon` contains the URL for an icon associated with this vehicle type.
   ///  * `localIcon` contains the URL for the icon associated with this
   /// vehicle type, based on the local transport signage.
-  final Vehicle? vehicle;
+  final TransitVehicle? vehicle;
 }
 
 /// Contains a single points object that holds an
@@ -1196,57 +1201,6 @@ class OverviewPolyline {
   final String? points;
 }
 
-/// Details about the total distance covered by this leg, with the
-/// following elements:
-///   * `value` indicates the distance in meters
-///   * `text` contains a human-readable representation of the
-/// distance, displayed in units as used at the origin (or as
-/// overridden within the `units` parameter in the request).
-/// (For example, miles and feet will be used for any origin
-/// within the United States.) Note that regardless of what
-/// unit system is displayed as text, the `distance.value`
-/// field always contains a value expressed in meters.
-class Distance {
-  const Distance({this.text, this.value});
-
-  factory Distance.fromMap(Map<String, dynamic> map) => Distance(
-        text: map['text'] as String?,
-        value: map['value'] as num?,
-      );
-
-  /// Contains a human-readable representation of the
-  /// distance, displayed in units as used at the origin (or as
-  /// overridden within the `units` parameter in the request).
-  /// (For example, miles and feet will be used for any origin
-  /// within the United States.) Note that regardless of what
-  /// unit system is displayed as text, the `distance.value`
-  /// field always contains a value expressed in meters.
-  final String? text;
-
-  /// Indicates the distance in meters
-  final num? value;
-}
-
-/// Details about the total duration, with the following elements:
-///   * `value` indicates the duration in seconds.
-///   * `text` contains a human-readable representation of the
-/// duration.
-class DirectionsDuration {
-  const DirectionsDuration({this.text, this.value});
-
-  factory DirectionsDuration.fromMap(Map<String, dynamic> map) =>
-      DirectionsDuration(
-        text: map['text'] as String?,
-        value: map['value'] as num?,
-      );
-
-  /// Contains a human-readable representation of the duration.
-  final String? text;
-
-  /// Indicates the duration in seconds.
-  final num? value;
-}
-
 /// Details about the time, with the following elements:
 ///   * `value` the time specified as a [DateTime] object.
 ///   * `text` the time specified as a [String]. The time is displayed
@@ -1256,14 +1210,15 @@ class DirectionsDuration {
 /// Database][iana], e.g. `"America/New_York"`.
 ///
 /// [iana]: http://www.iana.org/time-zones
-class Time {
-  const Time({
+class TimeZoneTextValue {
+  const TimeZoneTextValue({
     this.text,
     this.timeZone,
     this.value,
   });
 
-  factory Time.fromMap(Map<String, dynamic> map) => Time(
+  factory TimeZoneTextValue.fromMap(Map<String, dynamic> map) =>
+      TimeZoneTextValue(
         text: map['text'] as String?,
         timeZone: map['time_zone'] as String?,
         value: map['value'] != null
@@ -1374,22 +1329,24 @@ class TransitAgency {
 /// This may include the following properties:
 ///  * `name` contains the name of the vehicle on this line. eg. "Subway."
 ///  * `type` contains the type of vehicle that runs on this line.
-/// See the [VehicleType] documentation for a complete list of
+/// See the [TransitVehicleType] documentation for a complete list of
 /// supported values.
 ///  * `icon` contains the URL for an icon associated with this vehicle type.
 ///  * `localIcon` contains the URL for the icon associated with this
 /// vehicle type, based on the local transport signage.
-class Vehicle {
-  const Vehicle({
+class TransitVehicle {
+  const TransitVehicle({
     this.name,
     this.type,
     this.icon,
     this.localIcon,
   });
 
-  factory Vehicle.fromMap(Map<String, dynamic> map) => Vehicle(
+  factory TransitVehicle.fromMap(Map<String, dynamic> map) => TransitVehicle(
         name: map['name'] as String?,
-        type: map['type'] != null ? VehicleType.fromJson(map['type']) : null,
+        type: map['type'] != null
+            ? TransitVehicleType.fromJson(map['type'])
+            : null,
         icon: map['icon'] as String?,
         localIcon: map['local_icon'] as String?,
       );
@@ -1398,7 +1355,7 @@ class Vehicle {
   final String? name;
 
   /// Contains the type of vehicle that runs on this line.
-  final VehicleType? type;
+  final TransitVehicleType? type;
 
   /// Contains the URL for an icon associated with this vehicle type.
   final String? icon;
@@ -1432,6 +1389,21 @@ class ViaWaypoint {
   /// The position of the waypoint along the step's polyline,
   /// expressed as a ratio from 0 to 1.
   final num? stepInterpolation;
+}
+
+/// An object containing a numeric value
+/// and its formatted text representation.
+class TextValue {
+  const TextValue({this.text, this.value});
+
+  factory TextValue.fromMap(Map<String, dynamic> map) => TextValue(
+        text: map['text'] as String?,
+        value: map['value'] as num?,
+      );
+
+  final String? text;
+
+  final num? value;
 }
 
 /// The status field within the Directions response object contains
@@ -1496,7 +1468,7 @@ enum DirectionsStatus {
 }
 
 /// Type of vehicle.
-enum VehicleType {
+enum TransitVehicleType {
   /// Bus.
   bus('BUS'),
 
@@ -1556,9 +1528,9 @@ enum VehicleType {
 
   final String key;
 
-  const VehicleType(this.key);
+  const TransitVehicleType(this.key);
 
-  static VehicleType fromJson(String key) =>
+  static TransitVehicleType fromJson(String key) =>
       values.firstWhere((element) => element.key == key);
 
   String toJson() => key;
