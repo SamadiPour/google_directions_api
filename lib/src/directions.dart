@@ -4,17 +4,27 @@
 
 import 'dart:convert';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart'
     as gpl;
 import 'package:http/http.dart' as http;
 
+import 'converters.dart';
+
 part 'directions.request.dart';
 part 'directions.response.dart';
 
+part 'directions.freezed.dart';
+part 'directions.g.dart';
+
+
 /// This service is used to calculate route between two points
 class DirectionsService {
-  static const _directionApiUrl =
-      'https://maps.googleapis.com/maps/api/directions/json';
+  Uri get _directionApiUrl => Uri(
+        scheme: 'https',
+        host: 'maps.googleapis.com',
+        path: '/maps/api/directions/json',
+      );
 
   static String? _apiKey;
 
@@ -37,22 +47,30 @@ class DirectionsService {
     DirectionsRequest request,
     void Function(DirectionsResult, DirectionsStatus?) callback,
   ) async {
-    final url = '$_directionApiUrl${request.toString()}&key=$apiKey';
-    final response = await http.get(Uri.parse(url));
+    final response = await http.get(
+      _directionApiUrl.replace(
+        queryParameters: {
+          'key': apiKey,
+          ...request.toJson(),
+        },
+      ),
+    );
 
     if (response.statusCode != 200) {
       throw Exception(
-          '${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}');
+        '${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}',
+      );
     }
 
-    final result = DirectionsResult.fromMap(json.decode(response.body));
+    final result = DirectionsResult.fromJson(json.decode(response.body));
 
     callback(result, result.status);
   }
 }
 
 /// A pair of latitude and longitude coordinates, stored as degrees.
-class GeoCoord {
+@freezed
+class GeoCoord with _$GeoCoord {
   /// Creates a geographical location specified in degrees [latitude] and
   /// [longitude].
   ///
@@ -60,34 +78,20 @@ class GeoCoord {
   ///
   /// The longitude is normalized to the half-open interval from -180.0
   /// (inclusive) to +180.0 (exclusive)
-  const GeoCoord(double latitude, double longitude)
-      : latitude =
-            (latitude < -90.0 ? -90.0 : (90.0 < latitude ? 90.0 : latitude)),
-        longitude = (longitude + 180.0) % 360.0 - 180.0;
+  const factory GeoCoord({
+    /// Latitude in degrees.
+    /// The latitude in degrees between -90.0 and 90.0, both inclusive.
+    @Assert('latitude >= -90.0 && latitude <= 90.0')
+    @JsonKey(name: 'lat') required double latitude,
 
-  /// The latitude in degrees between -90.0 and 90.0, both inclusive.
-  final double latitude;
+    /// Longitude in degrees.
+    /// The longitude in degrees between -180.0 (inclusive) and 180.0 (exclusive).
+    @Assert('longitude >= -180.0 && longitude < 180.0')
+    @JsonKey(name: 'lng') required double longitude,
+  }) = _GeoCoord;
 
-  /// The longitude in degrees between -180.0 (inclusive) and 180.0 (exclusive).
-  final double longitude;
-
-  static GeoCoord _fromList(List<num> list) => GeoCoord(
-        list[0] as double,
-        list[1] as double,
-      );
-
-  @override
-  String toString() => '$runtimeType($latitude, $longitude)';
-
-  @override
-  bool operator ==(Object other) {
-    return other is GeoCoord &&
-        other.latitude == latitude &&
-        other.longitude == longitude;
-  }
-
-  @override
-  int get hashCode => latitude.hashCode + longitude.hashCode;
+  factory GeoCoord.fromJson(Map<String, dynamic> json) =>
+      _$GeoCoordFromJson(json);
 }
 
 /// A latitude/longitude aligned rectangle.
@@ -98,19 +102,24 @@ class GeoCoord {
 ///   if `southwest.longitude` ≤ `northeast.longitude`,
 /// * lng ∈ [-180, `northeast.longitude`] ∪ [`southwest.longitude`, 180],
 ///   if `northeast.longitude` < `southwest.longitude`
-class GeoCoordBounds {
+@freezed
+class GeoCoordBounds with _$GeoCoordBounds {
+  const GeoCoordBounds._();
+
   /// Creates geographical bounding box with the specified corners.
   ///
   /// The latitude of the southwest corner cannot be larger than the
   /// latitude of the northeast corner.
-  GeoCoordBounds({required this.southwest, required this.northeast})
-      : assert(southwest.latitude <= northeast.latitude);
+  const factory GeoCoordBounds({
+    /// The southwest corner of the rectangle.
+    required GeoCoord southwest,
 
-  /// The southwest corner of the rectangle.
-  final GeoCoord southwest;
+    /// The northeast corner of the rectangle.
+    required GeoCoord northeast,
+  }) = _GeoCoordBounds;
 
-  /// The northeast corner of the rectangle.
-  final GeoCoord northeast;
+  factory GeoCoordBounds.fromJson(Map<String, dynamic> json) =>
+      _$GeoCoordBoundsFromJson(json);
 
   /// Returns whether this rectangle contains the given [GeoCoord].
   bool contains(GeoCoord point) {
@@ -129,21 +138,6 @@ class GeoCoordBounds {
       return southwest.longitude <= lng || lng <= northeast.longitude;
     }
   }
-
-  @override
-  String toString() {
-    return '$runtimeType($southwest, $northeast)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is GeoCoordBounds &&
-        other.southwest == southwest &&
-        other.northeast == northeast;
-  }
-
-  @override
-  int get hashCode => southwest.hashCode + northeast.hashCode;
 }
 
 /// Represents an enum of various travel modes.
@@ -152,25 +146,17 @@ class GeoCoordBounds {
 /// `DirectionsRequest` as well as the travel modes returned
 /// in a `DirectionsStep`. Specify these by value, or by using
 /// the constant's name.
+@JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum TravelMode {
   /// Specifies a bicycling directions request.
-  bicycling('BICYCLING'),
+  bicycling,
 
   /// Specifies a driving directions request.
-  driving('DRIVING'),
+  driving,
 
   /// Specifies a transit directions request.
-  transit('TRANSIT'),
+  transit,
 
   /// Specifies a walking directions request.
-  walking('WALKING');
-
-  final String key;
-
-  const TravelMode(this.key);
-
-  static TravelMode fromJson(String key) =>
-      values.firstWhere((element) => element.key == key);
-
-  String toJson() => key;
+  walking;
 }
