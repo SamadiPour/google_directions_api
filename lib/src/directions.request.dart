@@ -61,7 +61,7 @@ class DirectionsRequest with _$DirectionsRequest {
     /// specified in [TravelModes].
     ///
     /// Default value is [TravelMode.driving]
-    @JsonKey(toJson: _lowercaseTravelMode) TravelMode? travelMode,
+    @JsonKey(name:'mode', toJson: _lowercaseTravelMode) TravelMode? travelMode,
 
     /// Specifies an array of intermediate locations to include
     /// along the route between the origin and destination points

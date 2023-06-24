@@ -464,7 +464,7 @@ mixin _$DirectionsRequest {
   /// specified in [TravelModes].
   ///
   /// Default value is [TravelMode.driving]
-  @JsonKey(toJson: _lowercaseTravelMode)
+  @JsonKey(name: 'mode', toJson: _lowercaseTravelMode)
   TravelMode? get travelMode => throw _privateConstructorUsedError;
 
   /// Specifies an array of intermediate locations to include
@@ -566,14 +566,20 @@ abstract class $DirectionsRequestCopyWith<$Res> {
       _$DirectionsRequestCopyWithImpl<$Res, DirectionsRequest>;
   @useResult
   $Res call(
-      {@MultiTypeLocationNullableConverter() dynamic origin,
-      @MultiTypeLocationNullableConverter() dynamic destination,
-      @JsonKey(toJson: _lowercaseTravelMode) TravelMode? travelMode,
+      {@MultiTypeLocationNullableConverter()
+          dynamic origin,
+      @MultiTypeLocationNullableConverter()
+          dynamic destination,
+      @JsonKey(name: 'mode', toJson: _lowercaseTravelMode)
+          TravelMode? travelMode,
       List<DirectionsWaypoint>? waypoints,
-      @JsonKey(includeToJson: false) bool? optimizeWaypoints,
-      @BoolQueryNullableConverter() bool? alternatives,
+      @JsonKey(includeToJson: false)
+          bool? optimizeWaypoints,
+      @BoolQueryNullableConverter()
+          bool? alternatives,
       UnitSystem? unitSystem,
-      @AvoidTypeQueryNullableConverter() List<AvoidType>? avoid,
+      @AvoidTypeQueryNullableConverter()
+          List<AvoidType>? avoid,
       String? region,
       DrivingOptions? drivingOptions,
       TransitOptions? transitOptions,
@@ -695,14 +701,20 @@ abstract class _$$_DirectionsRequestCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@MultiTypeLocationNullableConverter() dynamic origin,
-      @MultiTypeLocationNullableConverter() dynamic destination,
-      @JsonKey(toJson: _lowercaseTravelMode) TravelMode? travelMode,
+      {@MultiTypeLocationNullableConverter()
+          dynamic origin,
+      @MultiTypeLocationNullableConverter()
+          dynamic destination,
+      @JsonKey(name: 'mode', toJson: _lowercaseTravelMode)
+          TravelMode? travelMode,
       List<DirectionsWaypoint>? waypoints,
-      @JsonKey(includeToJson: false) bool? optimizeWaypoints,
-      @BoolQueryNullableConverter() bool? alternatives,
+      @JsonKey(includeToJson: false)
+          bool? optimizeWaypoints,
+      @BoolQueryNullableConverter()
+          bool? alternatives,
       UnitSystem? unitSystem,
-      @AvoidTypeQueryNullableConverter() List<AvoidType>? avoid,
+      @AvoidTypeQueryNullableConverter()
+          List<AvoidType>? avoid,
       String? region,
       DrivingOptions? drivingOptions,
       TransitOptions? transitOptions,
@@ -798,7 +810,7 @@ class _$_DirectionsRequest implements _DirectionsRequest {
   const _$_DirectionsRequest(
       {@MultiTypeLocationNullableConverter() required this.origin,
       @MultiTypeLocationNullableConverter() required this.destination,
-      @JsonKey(toJson: _lowercaseTravelMode) this.travelMode,
+      @JsonKey(name: 'mode', toJson: _lowercaseTravelMode) this.travelMode,
       final List<DirectionsWaypoint>? waypoints,
       @JsonKey(includeToJson: false) this.optimizeWaypoints,
       @BoolQueryNullableConverter() this.alternatives,
@@ -866,7 +878,7 @@ class _$_DirectionsRequest implements _DirectionsRequest {
   ///
   /// Default value is [TravelMode.driving]
   @override
-  @JsonKey(toJson: _lowercaseTravelMode)
+  @JsonKey(name: 'mode', toJson: _lowercaseTravelMode)
   final TravelMode? travelMode;
 
   /// Specifies an array of intermediate locations to include
@@ -1061,14 +1073,20 @@ class _$_DirectionsRequest implements _DirectionsRequest {
 
 abstract class _DirectionsRequest implements DirectionsRequest {
   const factory _DirectionsRequest(
-      {@MultiTypeLocationNullableConverter() required final dynamic origin,
-      @MultiTypeLocationNullableConverter() required final dynamic destination,
-      @JsonKey(toJson: _lowercaseTravelMode) final TravelMode? travelMode,
+      {@MultiTypeLocationNullableConverter()
+          required final dynamic origin,
+      @MultiTypeLocationNullableConverter()
+          required final dynamic destination,
+      @JsonKey(name: 'mode', toJson: _lowercaseTravelMode)
+          final TravelMode? travelMode,
       final List<DirectionsWaypoint>? waypoints,
-      @JsonKey(includeToJson: false) final bool? optimizeWaypoints,
-      @BoolQueryNullableConverter() final bool? alternatives,
+      @JsonKey(includeToJson: false)
+          final bool? optimizeWaypoints,
+      @BoolQueryNullableConverter()
+          final bool? alternatives,
       final UnitSystem? unitSystem,
-      @AvoidTypeQueryNullableConverter() final List<AvoidType>? avoid,
+      @AvoidTypeQueryNullableConverter()
+          final List<AvoidType>? avoid,
       final String? region,
       final DrivingOptions? drivingOptions,
       final TransitOptions? transitOptions,
@@ -1130,7 +1148,7 @@ abstract class _DirectionsRequest implements DirectionsRequest {
   /// specified in [TravelModes].
   ///
   /// Default value is [TravelMode.driving]
-  @JsonKey(toJson: _lowercaseTravelMode)
+  @JsonKey(name: 'mode', toJson: _lowercaseTravelMode)
   TravelMode? get travelMode;
   @override
 
@@ -4481,10 +4499,10 @@ mixin _$DirectionsStep {
   /// This field is only returned with `travelMode` is set to
   /// "transit". See Transit Details below. (Corresponds to transit
   /// in the [Directions.Step interface][directions_step_interface].)
+  @JsonKey(name: 'transit_details')
   TransitDetails? get transit => throw _privateConstructorUsedError;
 
   /// Contains the type of travel mode used.
-  @JsonKey(name: 'transit_details')
   TravelMode? get travelMode => throw _privateConstructorUsedError;
 
   /// Contains a points describing the course of this step.
@@ -4513,8 +4531,8 @@ abstract class $DirectionsStepCopyWith<$Res> {
       GeoCoord? startLocation,
       @JsonKey(name: 'html_instructions') String? instructions,
       List<DirectionsStep>? steps,
-      TransitDetails? transit,
-      @JsonKey(name: 'transit_details') TravelMode? travelMode,
+      @JsonKey(name: 'transit_details') TransitDetails? transit,
+      TravelMode? travelMode,
       OverviewPolyline? polyline,
       String? maneuver});
 
@@ -4682,8 +4700,8 @@ abstract class _$$_DirectionsStepCopyWith<$Res>
       GeoCoord? startLocation,
       @JsonKey(name: 'html_instructions') String? instructions,
       List<DirectionsStep>? steps,
-      TransitDetails? transit,
-      @JsonKey(name: 'transit_details') TravelMode? travelMode,
+      @JsonKey(name: 'transit_details') TransitDetails? transit,
+      TravelMode? travelMode,
       OverviewPolyline? polyline,
       String? maneuver});
 
@@ -4778,8 +4796,8 @@ class _$_DirectionsStep implements _DirectionsStep {
       this.startLocation,
       @JsonKey(name: 'html_instructions') this.instructions,
       final List<DirectionsStep>? steps,
-      this.transit,
-      @JsonKey(name: 'transit_details') this.travelMode,
+      @JsonKey(name: 'transit_details') this.transit,
+      this.travelMode,
       this.polyline,
       this.maneuver})
       : _steps = steps;
@@ -4839,11 +4857,11 @@ class _$_DirectionsStep implements _DirectionsStep {
   /// "transit". See Transit Details below. (Corresponds to transit
   /// in the [Directions.Step interface][directions_step_interface].)
   @override
+  @JsonKey(name: 'transit_details')
   final TransitDetails? transit;
 
   /// Contains the type of travel mode used.
   @override
-  @JsonKey(name: 'transit_details')
   final TravelMode? travelMode;
 
   /// Contains a points describing the course of this step.
@@ -4922,8 +4940,8 @@ abstract class _DirectionsStep implements DirectionsStep {
       final GeoCoord? startLocation,
       @JsonKey(name: 'html_instructions') final String? instructions,
       final List<DirectionsStep>? steps,
-      final TransitDetails? transit,
-      @JsonKey(name: 'transit_details') final TravelMode? travelMode,
+      @JsonKey(name: 'transit_details') final TransitDetails? transit,
+      final TravelMode? travelMode,
       final OverviewPolyline? polyline,
       final String? maneuver}) = _$_DirectionsStep;
 
@@ -4971,11 +4989,11 @@ abstract class _DirectionsStep implements DirectionsStep {
   /// This field is only returned with `travelMode` is set to
   /// "transit". See Transit Details below. (Corresponds to transit
   /// in the [Directions.Step interface][directions_step_interface].)
+  @JsonKey(name: 'transit_details')
   TransitDetails? get transit;
   @override
 
   /// Contains the type of travel mode used.
-  @JsonKey(name: 'transit_details')
   TravelMode? get travelMode;
   @override
 

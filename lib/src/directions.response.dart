@@ -730,10 +730,10 @@ class DirectionsStep with _$DirectionsStep {
     /// This field is only returned with `travelMode` is set to
     /// "transit". See Transit Details below. (Corresponds to transit
     /// in the [Directions.Step interface][directions_step_interface].)
-    TransitDetails? transit,
+    @JsonKey(name: 'transit_details') TransitDetails? transit,
 
     /// Contains the type of travel mode used.
-    @JsonKey(name: 'transit_details') TravelMode? travelMode,
+    TravelMode? travelMode,
 
     /// Contains a points describing the course of this step.
     OverviewPolyline? polyline,
